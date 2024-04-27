@@ -1,10 +1,12 @@
-const errorHandler = require("../handlers/errorHandler");
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const cartModel = require("../models/CartModel");
-const ProfilesModel = require("../models/ProfilesModel");
-const path = require("path");
-const getPDF = async (req, res, next) => {
+import errorHandler from "../handlers/errorHandler";
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
+import cartModel from "../models/CartModel";
+import ProfilesModel from "../models/ProfilesModel";
+import path from "path";
+import { NextFunction, Request, Response } from "express";
+
+const getPDF = async (req:Request, res:Response, next:NextFunction) => {
     const { profileID } = req.body;
     if (!profileID) return res.end('profileID is required!');
     try {
@@ -31,11 +33,11 @@ const getPDF = async (req, res, next) => {
     const cellPadding = 5;
 
     // Function to draw table
-    const drawTable = (tableHeaders, tableRows, colWidths, tableWidth) => {
+    const drawTable = (tableHeaders:any, tableRows:any, colWidths:any, tableWidth:any) => {
         doc.font('Helvetica-Bold');
 
         // Calculate row heights
-        const rowHeights = tableRows.map(row => {
+        const rowHeights = tableRows.map(row:any => {
             // Calculate height of each cell
             const cellHeights = row.map((cell, i) => {
                 const cellWidth = colWidths[i] - (2 * cellPadding);
@@ -90,11 +92,11 @@ const getPDF = async (req, res, next) => {
 
     return res.end('PDF created!');
 
-    } catch (err) {
+    } catch (err:any) {
         return next(new errorHandler(err.message, 500));
     }
 }
 
-module.exports = {
+export default {
     getPDF
 }

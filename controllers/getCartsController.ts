@@ -1,8 +1,9 @@
-const errorHandler = require("../handlers/errorHandler");
-const cartModel = require("../models/CartModel");
-const ProfilesModel = require("../models/ProfilesModel");
+import { NextFunction, Request, Response } from "express";
+import errorHandler from "../handlers/errorHandler";
+import cartModel from "../models/CartModel";
+import ProfilesModel from "../models/ProfilesModel";
 
-const getcarts = async(req, res, next)=>{
+const getcarts = async(req:Request, res:Response, next:NextFunction)=>{
     const {userID, profileID} = req.body;
     if(!profileID) return res.send("profileID is required!");
     try{
@@ -13,11 +14,11 @@ const getcarts = async(req, res, next)=>{
         }else{
             return res.send("profile doesn't exists!!");
         }
-    }catch(err){
+    }catch(err: any){
         return next(new errorHandler(err.message, 500));
     }
 }
 
-module.exports = {
+export default {
     getcarts
 }
