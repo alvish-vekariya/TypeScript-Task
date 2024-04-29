@@ -6,94 +6,37 @@ import ProfilesModel from "../models/ProfilesModel";
 import path from "path";
 import { NextFunction, Request, Response } from "express";
 
-const getPDF = async (req:Request, res:Response, next:NextFunction) => {
-    const { profileID } = req.body;
-    if (!profileID) return res.end('profileID is required!');
-    try {
-        const doc = new PDFDocument();
-    const Data = await cartModel.find({"profileID": profileID});
+const getPDF = async(req:Request,res:Response,next:NextFunction)=>{
+    const reqProfileID: string = req.body.profileID;
 
-    // Pipe the PDF to a file
-    const pdfPath = path.join(__dirname, "..", "cart pdfs", `${profileID}.pdf`);
-    doc.pipe(fs.createWriteStream(pdfPath));
-
-    // Add content to the PDF
-    doc.fontSize(16).text(`${profileID}'s cart`, { align: 'center' });
-    doc.moveDown();
-
-    // Define table properties
-    const tableHeaders = ['Index', 'ProductID', 'Quantity', 'Total'];
-    const tableRows = Data.map((item, index) => [index + 1, item.productID, item.quantity, item.total]);
-
-    // Calculate column widths
-    const colWidths = [70, 150, 100, 100];
-    const tableWidth = colWidths.reduce((acc, width) => acc + width, 0);
-
-    // Set cell padding
-    const cellPadding = 5;
-
-    // Function to draw table
-    const drawTable = (tableHeaders:any, tableRows:any, colWidths:any, tableWidth:any) => {
-        doc.font('Helvetica-Bold');
-
-        // Calculate row heights
-        const rowHeights = tableRows.map(row:any => {
-            // Calculate height of each cell
-            const cellHeights = row.map((cell, i) => {
-                const cellWidth = colWidths[i] - (2 * cellPadding);
-                return doc.heightOfString(cell.toString(), { width: cellWidth });
-            });
-            // Ensure all cell heights are valid numbers
-            if (cellHeights.some(height => isNaN(height))) {
-                return 0; // If any height is NaN, return 0
-            }
-            // Return maximum cell height plus padding
-            return Math.max(...cellHeights) + 2 * cellPadding;
-        });
-
-        // Calculate height of header row
-        const headerHeight = Math.max(...tableHeaders.map((header, i) => {
-            const headerWidth = colWidths[i] - (2 * cellPadding);
-            return doc.heightOfString(header.toString(), { width: headerWidth }) + 2 * cellPadding;
-        }));
-
-        let y = doc.y + headerHeight;
-        const startX = (doc.page.width - tableWidth) / 2;
-        const startY = y - headerHeight;
-
-        // Draw table headers
-        tableHeaders.forEach((header, i) => {
-            doc.rect(startX + colWidths.slice(0, i).reduce((acc, width) => acc + width, 0), startY, colWidths[i], headerHeight).stroke();
-            doc.text(header, startX + colWidths.slice(0, i).reduce((acc, width) => acc + width, 0) + cellPadding, startY + cellPadding, { width: colWidths[i] - (2 * cellPadding), align: 'center' });
-        });
-
-        // Draw table rows
-        doc.font('Helvetica');
-        tableRows.forEach((row, rowIndex) => {
-            const rowHeight = rowHeights[rowIndex];
-            row.forEach((cell, i) => {
-                doc.rect(startX + colWidths.slice(0, i).reduce((acc, width) => acc + width, 0), y, colWidths[i], rowHeight).stroke();
-                const cellHeight = doc.heightOfString(cell.toString(), { width: colWidths[i] - (2 * cellPadding) });
-                const lineHeight = Math.max(cellHeight, rowHeight);
-                doc.text(cell.toString(), startX + colWidths.slice(0, i).reduce((acc, width) => acc + width, 0) + cellPadding, y + cellPadding, { width: colWidths[i] - (2 * cellPadding), align: 'center' });
-            });
-            y += rowHeight;
-        });
+    try{
+        const findCarts = await cartModel.find({profileID: reqProfileID});
         
-        // Draw bottom border
-        doc.rect(startX, startY, tableWidth, y - startY).stroke();
-    };
+        const cartprofileID = findCarts[0].profileID as string;
+        console.log(cartprofileID.toString()) ;
 
-    // Draw the table
-    drawTable(tableHeaders, tableRows, colWidths, tableWidth);
+        const doc = new PDFDocument();
 
-    // Finalize the PDF and close the stream
-    doc.end();
+        const writestream = fs.createWriteStream(path.join(__dirname,'..','cart pdfs','profile.pdf'));
+        doc.pipe(writestream);
+        doc.fontSize(16).text("cart's PDF", {align : 'center'});
+        doc.moveDown();
+        doc.fontSize(12).text('sr. no.',100,100);
+        doc.text('productID',150,100);
+        doc.text('quantity',300,100);
+        doc.text('total',400,100)
 
-    return res.end('PDF created!');
-
-    } catch (err:any) {
-        return next(new errorHandler(err.message, 500));
+        let yPosition = 120;
+        findCarts.forEach((ele, index)=>{
+            doc.fontSize(10).text((index+1).toString(), 100, yPosition);
+            doc.text(ele.productID as string, 150, yPosition);
+            doc.text(ele.quantity.toString(),300, yPosition);
+            doc.text(ele.total.toString(), 400, yPosition);
+            yPosition += 20;
+        })
+        doc.end();
+    }catch(err: any){
+        return next(new errorHandler(err.message,500));
     }
 }
 

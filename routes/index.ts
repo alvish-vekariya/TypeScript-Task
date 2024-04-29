@@ -15,6 +15,7 @@ import getcart from './getCarts';
 import updatecart from './updateCart';
 import deletecart from './deleteCart';
 import getpdf from './getpdf';
+import dbPrac from '../controllers/testModels';
 
 router.use('/user/register', userRegisterRoute);
 router.use('/user/login', userLogin)
@@ -31,7 +32,7 @@ router.use('/user/getPdf', getpdf);
 router.use('/user/updatecart', updatecart);
 router.use('/user/deletecart', deletecart);
 router.use('/user/getcarts', getcart);
-// router.post('/test', require('../controllers/testModels').getOutput);
+router.post('/test', dbPrac.getOutput);
 
 
 export = router;
