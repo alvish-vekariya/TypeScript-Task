@@ -10,7 +10,12 @@ const loginUser = async (req:Request, res:Response, next:NextFunction)=>{
     const {username, password} = req.body;
     if(!username || !password) return res.status(499).send('username and password are required!');
     try{
-        const foundUser = await userModel.findOne({"username" : username});
+        interface interfaceUser{
+            _id : string,
+            username : string,
+            password: string
+        }
+        const foundUser = await userModel.findOne<interfaceUser>({"username" : username});
         if(foundUser){
             const validateUser = await bcrypt.compare(password,foundUser.password);
             // console.log(validateUser)
