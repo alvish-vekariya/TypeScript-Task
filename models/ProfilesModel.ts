@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config({ path : '../config/.env'})
 const mongoURL = process.env.MONGO_URL as string;
 
-mongoose.connect(mongoURL).then(()=> console.log('database connected')).catch(err=> console.error(err));
 
 interface schemaProfile {
     profileName: string,

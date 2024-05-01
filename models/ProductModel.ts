@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path : '../config/.env'})
 const mongoURL = process.env.MONGO_URL as string;
 
-mongoose.connect(mongoURL).then(()=> console.log('product database connected')).catch(err=> console.error(err));
+
 
 interface schemaProduct{
     productName : string,

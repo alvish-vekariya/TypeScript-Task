@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config({ path : '../config/.env'});
 const url  = process.env.MONGO_URL as string;
 
-mongoose.connect(url).then(()=>console.log('user database connected')).catch(err=> console.log(err));
 
 interface userSchema{
     username : string,
