@@ -10,7 +10,7 @@ const checklogin = async(req:express.Request, res: express.Response,next: expres
         return res.send("enter valid userid");
     }
     const checkLogin = await UserModel.findOne({_id:userID});
-    // console.log(checkLogin);
+    
     if(checkLogin == null){
         return res.send('login is required!!');            
     }
